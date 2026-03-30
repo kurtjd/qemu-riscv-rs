@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="utf-8"?>
+<device schemaVersion="1.1"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+  xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
+  <vendor>qemu.org</vendor>
+  <name>QEMU_RISCV_VIRT</name>
+  <series>RISC-V</series>
+  <version>0.1</version>
+  <description>QEMU RISC-V Virt Machine Platform</description>
+
+  <addressUnitBits>8</addressUnitBits>
+  <width>32</width>
+  <size>32</size>
+  <access>read-write</access>
+  <resetValue>0x00000000</resetValue>
+  <resetMask>0xFFFFFFFF</resetMask>
+
+  <cpu>
+    <name>riscv</name>
+    <revision>r0p0</revision>
+    <endian>little</endian>
+    <mpuPresent>false</mpuPresent>
+    <fpuPresent>false</fpuPresent>
+    <nvicPrioBits>0</nvicPrioBits>
+    <vendorSystickConfig>false</vendorSystickConfig>
+  </cpu>
+
+  <peripherals>
+
+    <!-- ================================================================ -->
+    <!-- CLINT - Core Local Interruptor                                   -->
+    <!-- ================================================================ -->
+    <peripheral>
+      <name>CLINT</name>
+      <description>Core Local Interruptor (SiFive CLINT compatible)</description>
+      <baseAddress>0x02000000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x10000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <registers>
+        <register>
+          <name>MSIP</name>
+          <description>Machine Software Interrupt Pending for hart 0</description>
+          <addressOffset>0x0000</addressOffset>
+          <fields>
+            <field>
+              <name>MSIP</name>
+              <description>Machine software interrupt pending</description>
+              <bitRange>[0:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>MTIMECMP_LO</name>
+          <description>Machine timer compare low word for hart 0</description>
+          <addressOffset>0x4000</addressOffset>
+        </register>
+        <register>
+          <name>MTIMECMP_HI</name>
+          <description>Machine timer compare high word for hart 0</description>
+          <addressOffset>0x4004</addressOffset>
+        </register>
+        <register>
+          <name>MTIME_LO</name>
+          <description>Machine timer low word</description>
+          <addressOffset>0xBFF8</addressOffset>
+        </register>
+        <register>
+          <name>MTIME_HI</name>
+          <description>Machine timer high word</description>
+          <addressOffset>0xBFFC</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <!-- ================================================================ -->
+    <!-- PLIC - Platform-Level Interrupt Controller                       -->
+    <!-- ================================================================ -->
+    <peripheral>
+      <name>PLIC</name>
+      <description>Platform-Level Interrupt Controller (SiFive PLIC compatible)</description>
+      <baseAddress>0x0C000000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x202000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <registers>
+        <register>
+          <dim>96</dim>
+          <dimIncrement>0x4</dimIncrement>
+          <name>PRIORITY[%s]</name>
+          <description>Priority for interrupt source %s (source 0 is reserved)</description>
+          <addressOffset>0x0</addressOffset>
+          <fields>
+            <field>
+              <name>PRIORITY</name>
+              <description>Priority level (0=disabled, 1=lowest, 7=highest)</description>
+              <bitRange>[2:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <dim>3</dim>
+          <dimIncrement>0x4</dimIncrement>
+          <name>PENDING%s</name>
+          <description>Interrupt pending bits</description>
+          <addressOffset>0x1000</addressOffset>
+          <access>read-only</access>
+        </register>
+        <register>
+          <dim>3</dim>
+          <dimIncrement>0x4</dimIncrement>
+          <name>M_ENABLE%s</name>
+          <description>M-mode interrupt enable bits (context 0)</description>
+          <addressOffset>0x2000</addressOffset>
+        </register>
+        <register>
+          <dim>3</dim>
+          <dimIncrement>0x4</dimIncrement>
+          <name>S_ENABLE%s</name>
+          <description>S-mode interrupt enable bits (context 1)</description>
+          <addressOffset>0x2080</addressOffset>
+        </register>
+        <register>
+          <name>M_THRESHOLD</name>
+          <description>M-mode priority threshold (context 0)</description>
+          <addressOffset>0x200000</addressOffset>
+          <fields>
+            <field>
+              <name>THRESHOLD</name>
+              <description>Priority threshold (interrupts with priority &lt;= threshold are masked)</description>
+              <bitRange>[2:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>M_CLAIM</name>
+          <description>M-mode interrupt claim/complete (context 0). Read to claim, write to complete.</description>
+          <addressOffset>0x200004</addressOffset>
+        </register>
+        <register>
+          <name>S_THRESHOLD</name>
+          <description>S-mode priority threshold (context 1)</description>
+          <addressOffset>0x201000</addressOffset>
+          <fields>
+            <field>
+              <name>THRESHOLD</name>
+              <description>Priority threshold (interrupts with priority &lt;= threshold are masked)</description>
+              <bitRange>[2:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>S_CLAIM</name>
+          <description>S-mode interrupt claim/complete (context 1). Read to claim, write to complete.</description>
+          <addressOffset>0x201004</addressOffset>
+        </register>
+      </registers>
+    </peripheral>
+
+    <!-- ================================================================ -->
+    <!-- UART0 - NS16550A compatible UART                                 -->
+    <!-- ================================================================ -->
+    <peripheral>
+      <name>UART0</name>
+      <description>NS16550A compatible UART</description>
+      <baseAddress>0x10000000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x100</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>UART0</name>
+        <description>UART0 interrupt (PLIC source 10)</description>
+        <value>10</value>
+      </interrupt>
+      <registers>
+        <cluster>
+          <name>DATA</name>
+          <description>UART registers when DLAB=0</description>
+          <headerStructName>UartData</headerStructName>
+          <addressOffset>0x0</addressOffset>
+          <register>
+            <name>RBR</name>
+            <description>Receiver Buffer Register (DLAB=0)</description>
+            <addressOffset>0x0</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x00</resetValue>
+          </register>
+          <register>
+            <name>THR</name>
+            <description>Transmitter Holding Register (DLAB=0)</description>
+            <addressOffset>0x0</addressOffset>
+            <size>8</size>
+            <access>write-only</access>
+            <resetValue>0x00</resetValue>
+          </register>
+          <register>
+            <name>IER</name>
+            <description>Interrupt Enable Register (DLAB=0)</description>
+            <addressOffset>0x1</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>ERBFI</name>
+                <description>Enable Received Data Available Interrupt</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>ETBEI</name>
+                <description>Enable Transmitter Holding Register Empty Interrupt</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>ELSI</name>
+                <description>Enable Receiver Line Status Interrupt</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>EDSSI</name>
+                <description>Enable Modem Status Interrupt</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>IIR</name>
+            <description>Interrupt Identification Register</description>
+            <addressOffset>0x2</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x01</resetValue>
+            <fields>
+              <field>
+                <name>IPEND</name>
+                <description>Interrupt NOT pending (0 = interrupt pending)</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>IID</name>
+                <description>Interrupt ID</description>
+                <bitRange>[3:1]</bitRange>
+              </field>
+              <field>
+                <name>FIFOEN</name>
+                <description>FIFOs enabled</description>
+                <bitRange>[7:6]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>FCR</name>
+            <description>FIFO Control Register</description>
+            <addressOffset>0x2</addressOffset>
+            <size>8</size>
+            <access>write-only</access>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>FIFOE</name>
+                <description>FIFO enable</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>RFIFOR</name>
+                <description>Receiver FIFO reset (self-clearing)</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>XFIFOR</name>
+                <description>Transmitter FIFO reset (self-clearing)</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>DMAM</name>
+                <description>DMA mode select</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>RFTL</name>
+                <description>Receiver FIFO trigger level</description>
+                <bitRange>[7:6]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>LCR</name>
+            <description>Line Control Register</description>
+            <addressOffset>0x3</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>WLS</name>
+                <description>Word length select</description>
+                <bitRange>[1:0]</bitRange>
+              </field>
+              <field>
+                <name>STB</name>
+                <description>Number of stop bits</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>PEN</name>
+                <description>Parity enable</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>EPS</name>
+                <description>Even parity select</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+              <field>
+                <name>SP</name>
+                <description>Stick parity</description>
+                <bitRange>[5:5]</bitRange>
+              </field>
+              <field>
+                <name>BC</name>
+                <description>Break control</description>
+                <bitRange>[6:6]</bitRange>
+              </field>
+              <field>
+                <name>DLAB</name>
+                <description>Divisor latch access bit</description>
+                <bitRange>[7:7]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>MCR</name>
+            <description>Modem Control Register</description>
+            <addressOffset>0x4</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>DTR</name>
+                <description>Data terminal ready</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>RTS</name>
+                <description>Request to send</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>OUT1</name>
+                <description>Output 1</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>OUT2</name>
+                <description>Output 2</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>LOOP</name>
+                <description>Loopback mode</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>LSR</name>
+            <description>Line Status Register</description>
+            <addressOffset>0x5</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x60</resetValue>
+            <fields>
+              <field>
+                <name>DR</name>
+                <description>Data ready</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>OE</name>
+                <description>Overrun error</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>PE</name>
+                <description>Parity error</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>FE</name>
+                <description>Framing error</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>BI</name>
+                <description>Break interrupt</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+              <field>
+                <name>THRE</name>
+                <description>Transmitter holding register empty</description>
+                <bitRange>[5:5]</bitRange>
+              </field>
+              <field>
+                <name>TEMT</name>
+                <description>Transmitter empty</description>
+                <bitRange>[6:6]</bitRange>
+              </field>
+              <field>
+                <name>EIRF</name>
+                <description>Error in receiver FIFO</description>
+                <bitRange>[7:7]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>MSR</name>
+            <description>Modem Status Register</description>
+            <addressOffset>0x6</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>DCTS</name>
+                <description>Delta clear to send</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>DDSR</name>
+                <description>Delta data set ready</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>TERI</name>
+                <description>Trailing edge ring indicator</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>DDCD</name>
+                <description>Delta data carrier detect</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>CTS</name>
+                <description>Clear to send</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+              <field>
+                <name>DSR</name>
+                <description>Data set ready</description>
+                <bitRange>[5:5]</bitRange>
+              </field>
+              <field>
+                <name>RI</name>
+                <description>Ring indicator</description>
+                <bitRange>[6:6]</bitRange>
+              </field>
+              <field>
+                <name>DCD</name>
+                <description>Data carrier detect</description>
+                <bitRange>[7:7]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>SCR</name>
+            <description>Scratch Register</description>
+            <addressOffset>0x7</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+          </register>
+        </cluster>
+        <cluster>
+          <name>DLAB</name>
+          <description>UART registers when DLAB=1</description>
+          <alternateCluster>DATA</alternateCluster>
+          <headerStructName>UartDlab</headerStructName>
+          <addressOffset>0x0</addressOffset>
+          <register>
+            <name>DLL</name>
+            <description>Divisor Latch LSB (DLAB=1)</description>
+            <addressOffset>0x0</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+          </register>
+          <register>
+            <name>DLM</name>
+            <description>Divisor Latch MSB (DLAB=1)</description>
+            <addressOffset>0x1</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+          </register>
+          <register>
+            <name>IIR</name>
+            <description>Interrupt Identification Register</description>
+            <addressOffset>0x2</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x01</resetValue>
+            <fields>
+              <field>
+                <name>IPEND</name>
+                <description>Interrupt NOT pending (0 = interrupt pending)</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>IID</name>
+                <description>Interrupt ID</description>
+                <bitRange>[3:1]</bitRange>
+              </field>
+              <field>
+                <name>FIFOEN</name>
+                <description>FIFOs enabled</description>
+                <bitRange>[7:6]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>FCR</name>
+            <description>FIFO Control Register</description>
+            <addressOffset>0x2</addressOffset>
+            <size>8</size>
+            <access>write-only</access>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>FIFOE</name>
+                <description>FIFO enable</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>RFIFOR</name>
+                <description>Receiver FIFO reset (self-clearing)</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>XFIFOR</name>
+                <description>Transmitter FIFO reset (self-clearing)</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>DMAM</name>
+                <description>DMA mode select</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>RFTL</name>
+                <description>Receiver FIFO trigger level</description>
+                <bitRange>[7:6]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>LCR</name>
+            <description>Line Control Register</description>
+            <addressOffset>0x3</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>WLS</name>
+                <description>Word length select</description>
+                <bitRange>[1:0]</bitRange>
+              </field>
+              <field>
+                <name>STB</name>
+                <description>Number of stop bits</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>PEN</name>
+                <description>Parity enable</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>EPS</name>
+                <description>Even parity select</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+              <field>
+                <name>SP</name>
+                <description>Stick parity</description>
+                <bitRange>[5:5]</bitRange>
+              </field>
+              <field>
+                <name>BC</name>
+                <description>Break control</description>
+                <bitRange>[6:6]</bitRange>
+              </field>
+              <field>
+                <name>DLAB</name>
+                <description>Divisor latch access bit</description>
+                <bitRange>[7:7]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>MCR</name>
+            <description>Modem Control Register</description>
+            <addressOffset>0x4</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>DTR</name>
+                <description>Data terminal ready</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>RTS</name>
+                <description>Request to send</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>OUT1</name>
+                <description>Output 1</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>OUT2</name>
+                <description>Output 2</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>LOOP</name>
+                <description>Loopback mode</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>LSR</name>
+            <description>Line Status Register</description>
+            <addressOffset>0x5</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x60</resetValue>
+            <fields>
+              <field>
+                <name>DR</name>
+                <description>Data ready</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>OE</name>
+                <description>Overrun error</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>PE</name>
+                <description>Parity error</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>FE</name>
+                <description>Framing error</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>BI</name>
+                <description>Break interrupt</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+              <field>
+                <name>THRE</name>
+                <description>Transmitter holding register empty</description>
+                <bitRange>[5:5]</bitRange>
+              </field>
+              <field>
+                <name>TEMT</name>
+                <description>Transmitter empty</description>
+                <bitRange>[6:6]</bitRange>
+              </field>
+              <field>
+                <name>EIRF</name>
+                <description>Error in receiver FIFO</description>
+                <bitRange>[7:7]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>MSR</name>
+            <description>Modem Status Register</description>
+            <addressOffset>0x6</addressOffset>
+            <size>8</size>
+            <access>read-only</access>
+            <resetValue>0x00</resetValue>
+            <fields>
+              <field>
+                <name>DCTS</name>
+                <description>Delta clear to send</description>
+                <bitRange>[0:0]</bitRange>
+              </field>
+              <field>
+                <name>DDSR</name>
+                <description>Delta data set ready</description>
+                <bitRange>[1:1]</bitRange>
+              </field>
+              <field>
+                <name>TERI</name>
+                <description>Trailing edge ring indicator</description>
+                <bitRange>[2:2]</bitRange>
+              </field>
+              <field>
+                <name>DDCD</name>
+                <description>Delta data carrier detect</description>
+                <bitRange>[3:3]</bitRange>
+              </field>
+              <field>
+                <name>CTS</name>
+                <description>Clear to send</description>
+                <bitRange>[4:4]</bitRange>
+              </field>
+              <field>
+                <name>DSR</name>
+                <description>Data set ready</description>
+                <bitRange>[5:5]</bitRange>
+              </field>
+              <field>
+                <name>RI</name>
+                <description>Ring indicator</description>
+                <bitRange>[6:6]</bitRange>
+              </field>
+              <field>
+                <name>DCD</name>
+                <description>Data carrier detect</description>
+                <bitRange>[7:7]</bitRange>
+              </field>
+            </fields>
+          </register>
+          <register>
+            <name>SCR</name>
+            <description>Scratch Register</description>
+            <addressOffset>0x7</addressOffset>
+            <size>8</size>
+            <resetValue>0x00</resetValue>
+          </register>
+        </cluster>
+      </registers>
+    </peripheral>
+
+  </peripherals>
+</device>

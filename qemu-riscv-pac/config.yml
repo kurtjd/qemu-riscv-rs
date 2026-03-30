@@ -1,0 +1,12 @@
+riscv_config:
+  harts:
+      - name: "H0"
+        value: 0
+        description: "Hart 0"
+
+  clint:
+    name: "CLINT"
+    mtime_freq: 10000000
+
+  base_isa: "rv32i"
+  mtvec_align: 128
