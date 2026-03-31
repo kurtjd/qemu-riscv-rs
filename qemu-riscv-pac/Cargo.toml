@@ -13,8 +13,6 @@ critical-section = { version = "1.2.0", optional = true }
 riscv = "0.16.0"
 riscv-peripheral = "0.5.0"
 riscv-rt = { version = "0.17.0", features = [
-    #"no-interrupts",
-    #"no-exceptions",
     "device",
     "memory",
 ], optional = true }
