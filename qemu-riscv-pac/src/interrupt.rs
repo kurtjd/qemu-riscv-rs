@@ -1,5 +1,26 @@
 pub use riscv::interrupt::Exception;
 pub use riscv::interrupt::Interrupt as CoreInterrupt;
+#[doc = r" Priority levels in the device"]
+# [riscv :: pac_enum (unsafe PriorityNumber)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Priority {
+    #[doc = "0 - Priority 0 (disabled)"]
+    P0 = 0,
+    #[doc = "1 - Priority 1 (lowest)"]
+    P1 = 1,
+    #[doc = "2 - Priority 2"]
+    P2 = 2,
+    #[doc = "3 - Priority 3"]
+    P3 = 3,
+    #[doc = "4 - Priority 4"]
+    P4 = 4,
+    #[doc = "5 - Priority 5"]
+    P5 = 5,
+    #[doc = "6 - Priority 6"]
+    P6 = 6,
+    #[doc = "7 - Priority 7 (highest)"]
+    P7 = 7,
+}
 #[doc = r" HARTs in the device"]
 # [riscv :: pac_enum (unsafe HartIdNumber)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -32,4 +53,14 @@ pub fn cause() -> Trap {
 pub enum ExternalInterrupt {
     #[doc = "10 - UART0 interrupt (PLIC source 10)"]
     UART0 = 10,
+}
+#[cfg(feature = "rt")]
+#[riscv_rt::core_interrupt(CoreInterrupt::MachineExternal)]
+unsafe fn plic_handler() {
+    let plic = unsafe { crate::Plic::steal() };
+    let claim = plic.ctx(Hart::H0).claim();
+    if let Some(s) = claim.claim::<ExternalInterrupt>() {
+        unsafe { _dispatch_external_interrupt(s.number()) }
+        claim.complete(s);
+    }
 }
