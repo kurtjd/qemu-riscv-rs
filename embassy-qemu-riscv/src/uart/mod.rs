@@ -1,3 +1,5 @@
+pub mod buffered;
+
 use crate::interrupt::typelevel::{Binding, Interrupt};
 use crate::pac::uart0;
 use crate::{pac, peripherals, plic};
@@ -166,9 +168,7 @@ pub enum Error {
     Overrun,
 }
 
-fn init<T: Instance>(config: Config) -> Result<(), Error> {
-    let info = T::info();
-
+fn init(reg: &uart0::RegisterBlock, config: Config) -> Result<(), Error> {
     // Calculate baud rate divisor: baud = clock / (16 * divisor)
     let divisor = UART_CLK
         .checked_div(16 * config.baudrate)
@@ -180,29 +180,27 @@ fn init<T: Instance>(config: Config) -> Result<(), Error> {
     let divisor = divisor as u16;
 
     // Set LCR: 8 data bits, 1 stop bit, no parity, DLAB=1
-    info.reg().data().lcr().write(|w| {
+    reg.data().lcr().write(|w| {
         // SAFETY: 0b11 is a valid 2-bit WLS value (8 data bits).
         unsafe { w.wls().bits(0b11) };
         w.dlab().set_bit()
     });
 
     // Write baud rate divisor
-    info.reg()
-        .dlab()
+    reg.dlab()
         .dll()
         // SAFETY: Any u8 value is a valid divisor latch LSB.
         .write(|w| unsafe { w.bits(divisor as u8) });
-    info.reg()
-        .dlab()
+    reg.dlab()
         .dlm()
         // SAFETY: Any u8 value is a valid divisor latch MSB.
         .write(|w| unsafe { w.bits((divisor >> 8) as u8) });
 
     // Clear DLAB to access normal registers
-    info.reg().dlab().lcr().modify(|_, w| w.dlab().clear_bit());
+    reg.dlab().lcr().modify(|_, w| w.dlab().clear_bit());
 
     // Enable and clear both FIFOs
-    info.reg().data().fcr().write(|w| {
+    reg.data().fcr().write(|w| {
         w.fifoe().set_bit();
         w.rfifor().set_bit();
         w.xfifor().set_bit()
@@ -210,7 +208,7 @@ fn init<T: Instance>(config: Config) -> Result<(), Error> {
 
     // Clear scratch register which we use for interrupt flags
     // SAFETY: Any u8 value is valid for the SCR register.
-    info.reg().data().scr().write(|w| unsafe { w.bits(0) });
+    reg.data().scr().write(|w| unsafe { w.bits(0) });
 
     Ok(())
 }
@@ -224,7 +222,7 @@ pub struct Uart<'d, M: Mode> {
 
 impl<'d, M: Mode> Uart<'d, M> {
     fn new_inner<T: Instance>(config: Config) -> Result<Self, Error> {
-        init::<T>(config)?;
+        init(T::info().reg(), config)?;
         let rx = UartRx::new_inner::<T>();
         let tx = UartTx::new_inner::<T>();
         Ok(Self { rx, tx })
@@ -373,7 +371,7 @@ impl<'d> UartRx<'d, Blocking> {
     /// Returns [`Error::InvalidBaud`] if the supplied baud rate can not be represented by
     /// given clock source.
     pub fn new_blocking<T: Instance>(_peri: Peri<'d, T>, config: Config) -> Result<Self, Error> {
-        init::<T>(config)?;
+        init(T::info().reg(), config)?;
         Ok(Self::new_inner::<T>())
     }
 }
@@ -390,7 +388,7 @@ impl<'d> UartRx<'d, Async> {
         _irq: impl Binding<T::Interrupt, InterruptHandler<T>>,
         config: Config,
     ) -> Result<Self, Error> {
-        init::<T>(config)?;
+        init(T::info().reg(), config)?;
         plic_enable_uart0();
         Ok(Self::new_inner::<T>())
     }
@@ -534,7 +532,7 @@ impl<'d> UartRx<'d, Async> {
 
 impl<'d, M: Mode> Drop for UartRx<'d, M> {
     fn drop(&mut self) {
-        drop_rx_tx(self.info);
+        drop_rx_tx(self.info.reg(), &self.info.rx_tx_refcount);
     }
 }
 
@@ -589,7 +587,7 @@ impl<'d> UartTx<'d, Blocking> {
     /// Returns [`Error::InvalidBaud`] if the supplied baud rate can not be represented by
     /// given clock source.
     pub fn new_blocking<T: Instance>(_peri: Peri<'d, T>, config: Config) -> Result<Self, Error> {
-        init::<T>(config)?;
+        init(T::info().reg(), config)?;
         Ok(Self::new_inner::<T>())
     }
 }
@@ -606,7 +604,7 @@ impl<'d> UartTx<'d, Async> {
         _irq: impl Binding<T::Interrupt, InterruptHandler<T>>,
         config: Config,
     ) -> Result<Self, Error> {
-        init::<T>(config)?;
+        init(T::info().reg(), config)?;
         plic_enable_uart0();
         Ok(Self::new_inner::<T>())
     }
@@ -658,15 +656,15 @@ impl<'d> UartTx<'d, Async> {
 
 impl<'d, M: Mode> Drop for UartTx<'d, M> {
     fn drop(&mut self) {
-        drop_rx_tx(self.info);
+        drop_rx_tx(self.info.reg(), &self.info.rx_tx_refcount);
     }
 }
 
-fn drop_rx_tx(info: &'static Info) {
+fn drop_rx_tx(reg: &uart0::RegisterBlock, refcount: &AtomicU8) {
     // Only disable UART once both UartRx and UartTx have been dropped
-    if info.rx_tx_refcount.fetch_sub(1, Ordering::AcqRel) == 1 {
+    if refcount.fetch_sub(1, Ordering::AcqRel) == 1 {
         // Disable all UART interrupts
-        info.reg().data().ier().reset();
+        reg.data().ier().reset();
         // Disable UART0 in the PLIC
         use pac::interrupt::ExternalInterrupt;
         plic().ctx0().enables().disable(ExternalInterrupt::UART0);
