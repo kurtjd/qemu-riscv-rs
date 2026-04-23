@@ -31,15 +31,26 @@ impl Clint {
         Self::new()
     }
 }
-#[doc = "Platform-Level Interrupt Controller (SiFive PLIC compatible)"]
-pub type Plic = crate::Periph<plic::RegisterBlock, 0x0c00_0000>;
-impl core::fmt::Debug for Plic {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        f.debug_struct("Plic").finish()
+riscv_peripheral :: plic_codegen ! (Plic , base 0xC000000 , harts [crate :: interrupt :: Hart :: H0 => 0]);
+impl Plic {
+    #[doc = r" Steal an instance of this peripheral"]
+    #[doc = r""]
+    #[doc = r" # Safety"]
+    #[doc = r""]
+    #[doc = r" Ensure that the new instance of the peripheral cannot be used in a way"]
+    #[doc = r" that may race with any existing instances, for example by only"]
+    #[doc = r" accessing read-only or write-only registers, or by consuming the"]
+    #[doc = r" original peripheral and using critical sections to coordinate"]
+    #[doc = r" access between multiple new instances."]
+    #[doc = r""]
+    #[doc = r" Additionally, other software such as HALs may rely on only one"]
+    #[doc = r" peripheral instance existing to ensure memory safety; ensure"]
+    #[doc = r" no stolen instances are passed to such software."]
+    #[inline]
+    pub unsafe fn steal() -> Self {
+        Self::new()
     }
 }
-#[doc = "Platform-Level Interrupt Controller (SiFive PLIC compatible)"]
-pub mod plic;
 #[doc = "NS16550A compatible UART"]
 pub type Uart0 = crate::Periph<uart0::RegisterBlock, 0x1000_0000>;
 impl core::fmt::Debug for Uart0 {

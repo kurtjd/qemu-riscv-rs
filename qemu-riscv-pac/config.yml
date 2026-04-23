@@ -4,9 +4,40 @@ riscv_config:
         value: 0
         description: "Hart 0"
 
+  priorities:
+      - name: "P0"
+        value: 0
+        description: "Priority 0 (disabled)"
+      - name: "P1"
+        value: 1
+        description: "Priority 1 (lowest)"
+      - name: "P2"
+        value: 2
+        description: "Priority 2"
+      - name: "P3"
+        value: 3
+        description: "Priority 3"
+      - name: "P4"
+        value: 4
+        description: "Priority 4"
+      - name: "P5"
+        value: 5
+        description: "Priority 5"
+      - name: "P6"
+        value: 6
+        description: "Priority 6"
+      - name: "P7"
+        value: 7
+        description: "Priority 7 (highest)"
+
   clint:
     name: "CLINT"
     mtime_freq: 10000000
+
+  plic:
+    name: "PLIC"
+    core_interrupt: "MachineExternal"
+    hart_id: "H0"
 
   base_isa: "rv32i"
   mtvec_align: 128
