@@ -168,6 +168,16 @@ pub enum Error {
     Overrun,
 }
 
+impl core::fmt::Display for Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::InvalidBaud => write!(f, "Invalid baud rate"),
+            Self::Overrun => write!(f, "RX FIFO overrun"),
+        }
+    }
+}
+impl core::error::Error for Error {}
+
 fn init(reg: &uart0::RegisterBlock, config: Config) -> Result<(), Error> {
     // Calculate baud rate divisor: baud = clock / (16 * divisor)
     let divisor = UART_CLK
