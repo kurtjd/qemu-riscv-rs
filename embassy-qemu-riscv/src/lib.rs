@@ -2,15 +2,17 @@
 mod interrupt_macros;
 #[cfg(feature = "time-driver")]
 mod time_driver;
+pub mod espi;
 pub mod uart;
 
 // Generate the typelevel interrupt module for all PLIC external interrupts.
-interrupt_mod!(UART0);
+interrupt_mod!(UART0, ESPI0);
 
 mod chip {
     #[rustfmt::skip]
     embassy_hal_internal::peripherals!(
         UART0,
+        ESPI0,
     );
 }
 

@@ -744,5 +744,98 @@
       </registers>
     </peripheral>
 
+    <!-- ================================================================ -->
+    <!-- ESPI0 - Enhanced SPI (eSPI) Virtual Wire / Shared Memory Device  -->
+    <!-- ================================================================ -->
+    <peripheral>
+      <name>ESPI0</name>
+      <description>eSPI virtual wire and shared memory controller</description>
+      <baseAddress>0x00102000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x14</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>ESPI0</name>
+        <description>ESPI0 interrupt (PLIC source 12)</description>
+        <value>12</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>INT_STATUS</name>
+          <description>Interrupt Status Register (write-1-to-clear)</description>
+          <addressOffset>0x00</addressOffset>
+          <fields>
+            <field>
+              <name>PERIPH_PENDING</name>
+              <description>Peripheral channel interrupt pending (peer wrote to shared memory)</description>
+              <bitRange>[0:0]</bitRange>
+            </field>
+            <field>
+              <name>VWIRE_PENDING</name>
+              <description>Virtual wire interrupt pending (peer updated virtual wires)</description>
+              <bitRange>[1:1]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>INT_ENABLE</name>
+          <description>Interrupt Enable Register</description>
+          <addressOffset>0x04</addressOffset>
+          <fields>
+            <field>
+              <name>PERIPH_EN</name>
+              <description>Enable peripheral channel interrupt</description>
+              <bitRange>[0:0]</bitRange>
+            </field>
+            <field>
+              <name>VWIRE_EN</name>
+              <description>Enable virtual wire interrupt</description>
+              <bitRange>[1:1]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>VWIRE_OUT</name>
+          <description>Virtual Wire Output Register</description>
+          <addressOffset>0x08</addressOffset>
+          <fields>
+            <field>
+              <name>DATA</name>
+              <description>Virtual wire output data sent to peer</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>VWIRE_IN</name>
+          <description>Virtual Wire Input Register (read-only)</description>
+          <addressOffset>0x0C</addressOffset>
+          <access>read-only</access>
+          <fields>
+            <field>
+              <name>DATA</name>
+              <description>Virtual wire input data received from peer</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>PERIPH_ADDR</name>
+          <description>Peripheral Address Register (offset of last peer shared memory write)</description>
+          <addressOffset>0x10</addressOffset>
+          <access>read-only</access>
+          <fields>
+            <field>
+              <name>OFFSET</name>
+              <description>Byte offset within shared memory of last peer write</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+      </registers>
+    </peripheral>
+
   </peripherals>
 </device>

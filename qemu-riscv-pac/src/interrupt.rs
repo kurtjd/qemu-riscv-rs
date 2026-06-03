@@ -53,6 +53,8 @@ pub fn cause() -> Trap {
 pub enum ExternalInterrupt {
     #[doc = "10 - UART0 interrupt (PLIC source 10)"]
     UART0 = 10,
+    #[doc = "12 - ESPI0 interrupt (PLIC source 12)"]
+    ESPI0 = 12,
 }
 #[cfg(feature = "rt")]
 #[riscv_rt::core_interrupt(CoreInterrupt::MachineExternal)]

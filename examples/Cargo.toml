@@ -1,0 +1,31 @@
+[package]
+name = "examples"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[profile.release]
+lto = true
+codegen-units = 1
+debug = true
+opt-level = "z"
+panic = "abort"
+
+[profile.dev.package."*"]
+opt-level = "z"
+
+[dependencies]
+embassy-qemu-riscv = { path = "../embassy-qemu-riscv", features = ["defmt"] }
+embassy-executor = { version = "0.9.1", features = ["arch-riscv32", "executor-thread"] }
+riscv-rt = "0.17.0"
+defmt = "0.3.6"
+defmt-semihosting = "0.3.0"
+semihosting = { version = "0.1", features = ["panic-handler"] }
+
+[[bin]]
+name = "espi_controller"
+path = "src/bin/espi_controller.rs"
+
+[[bin]]
+name = "espi_target"
+path = "src/bin/espi_target.rs"

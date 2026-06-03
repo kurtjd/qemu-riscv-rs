@@ -1,0 +1,27 @@
+[target.riscv32imac-unknown-none-elf]
+rustflags = ["-C", "link-arg=-Tlink.x", "-C", "link-arg=-Tdefmt.x"]
+
+[build]
+target = "riscv32imac-unknown-none-elf"
+
+[env]
+DEFMT_LOG = "trace"
+
+[alias]
+# Start as eSPI controller: creates the socket (server), waits for target to connect
+# Pipes QEMU output through defmt-print to decode defmt semihosting frames
+run-controller = [
+    "run",
+    "--bin",
+    "espi_controller",
+    "--config",
+    'target.riscv32imac-unknown-none-elf.runner="./run-controller.sh"',
+]
+# Start as eSPI target: connects to an existing socket created by the controller
+run-target = [
+    "run",
+    "--bin",
+    "espi_target",
+    "--config",
+    'target.riscv32imac-unknown-none-elf.runner="./run-target.sh"',
+]

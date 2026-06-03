@@ -60,6 +60,15 @@ impl core::fmt::Debug for Uart0 {
 }
 #[doc = "NS16550A compatible UART"]
 pub mod uart0;
+#[doc = "eSPI virtual wire and shared memory controller"]
+pub type Espi0 = crate::Periph<espi0::RegisterBlock, 0x0010_2000>;
+impl core::fmt::Debug for Espi0 {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("Espi0").finish()
+    }
+}
+#[doc = "eSPI virtual wire and shared memory controller"]
+pub mod espi0;
 #[unsafe(no_mangle)]
 static mut DEVICE_PERIPHERALS: bool = false;
 #[doc = r" All the peripherals."]
@@ -71,6 +80,8 @@ pub struct Peripherals {
     pub plic: Plic,
     #[doc = "UART0"]
     pub uart0: Uart0,
+    #[doc = "ESPI0"]
+    pub espi0: Espi0,
 }
 impl Peripherals {
     #[doc = r" Returns all the peripherals *once*."]
@@ -96,6 +107,7 @@ impl Peripherals {
             clint: unsafe { Clint::steal() },
             plic: unsafe { Plic::steal() },
             uart0: unsafe { Uart0::steal() },
+            espi0: unsafe { Espi0::steal() },
         }
     }
 }
