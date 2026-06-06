@@ -10,7 +10,7 @@ repository = "https://github.com/kurtjd/qemu-riscv-rs"
 
 [features]
 default = ["time-driver", "rt"]
-defmt = ["dep:defmt"]
+defmt = ["dep:defmt", "embedded-mcu-hal/defmt"]
 rt = ["dep:riscv-rt", "qemu-riscv-pac/rt"]
 v-trap = ["rt", "qemu-riscv-pac/v-trap"]
 
@@ -38,3 +38,4 @@ embedded-hal = { package = "embedded-hal", version = "1.0" }
 embedded-hal-async = "1.0"
 embedded-io = "0.7.1"
 embedded-io-async = "0.7.0"
+embedded-mcu-hal = { git = "https://github.com/OpenDevicePartnership/embedded-mcu" }

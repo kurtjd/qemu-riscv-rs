@@ -1,16 +1,19 @@
 #![no_std]
+pub mod i2c;
 mod interrupt_macros;
 #[cfg(feature = "time-driver")]
 mod time_driver;
 pub mod uart;
 
 // Generate the typelevel interrupt module for all PLIC external interrupts.
-interrupt_mod!(UART0);
+interrupt_mod!(UART0, I2C0, I2C_TARGET);
 
 mod chip {
     #[rustfmt::skip]
     embassy_hal_internal::peripherals!(
         UART0,
+        I2C0,
+        I2C_TARGET,
     );
 }
 
