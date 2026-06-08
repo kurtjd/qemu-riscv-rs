@@ -14,3 +14,8 @@ DEFMT_LOG = "trace"
 run-controller = ["run", "--bin", "i2c-controller"]
 # Run the I2C target example. Hosts the socket the controller connects to.
 run-target = ["run", "--bin", "i2c-target"]
+# Run the GPIO example as the socket master (hosts the GPIO socket).
+# Start this first, then `cargo run-gpio-slave` in another terminal.
+run-gpio-master = ["run", "--bin", "gpio", "--", "master"]
+# Run the GPIO example as the socket slave (connects to the master's socket).
+run-gpio-slave = ["run", "--bin", "gpio", "--", "slave"]

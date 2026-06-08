@@ -7,9 +7,15 @@
 #
 # Start the target first (`cargo run-target`), then the controller
 # (`cargo run-controller`).
+#
+# The GPIO example runs the same binary on two instances bridged over GPIO pin 0.
+# A runner argument selects the socket role: `master` hosts the socket, `slave`
+# connects to it. Start `cargo run-gpio-master` first, then `cargo run-gpio-slave`.
 ELF="$1"
+ROLE="$2"
 NAME=$(basename "$ELF")
 SOCK="${EC_I2C_SOCK:-/tmp/qemu-ec-i2c.sock}"
+GPIO_SOCK="${EC_GPIO_SOCK:-/tmp/qemu-ec-gpio.sock}"
 QEMU=~/repos/qemu/build/qemu-system-riscv32
 
 CHARDEV=""
@@ -21,6 +27,18 @@ case "$NAME" in
     i2c-target)
         # I2C target: host the socket so the controller can connect.
         CHARDEV="-chardev socket,id=ec-i2c-target,path=$SOCK,server=on,wait=off"
+        ;;
+    gpio)
+        case "$ROLE" in
+            master)
+                # GPIO master: host the socket so the slave can connect.
+                CHARDEV="-chardev socket,id=ec-gpio0,path=$GPIO_SOCK,server=on,wait=off"
+                ;;
+            slave)
+                # GPIO slave: connect to the master's socket as a client.
+                CHARDEV="-chardev socket,id=ec-gpio0,path=$GPIO_SOCK,server=off"
+                ;;
+        esac
         ;;
 esac
 

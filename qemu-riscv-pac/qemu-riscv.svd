@@ -971,5 +971,112 @@
       </registers>
     </peripheral>
 
+    <!-- ================================================================ -->
+    <!-- GPIO - Socket-backed bidirectional GPIO controller              -->
+    <!-- ================================================================ -->
+    <peripheral>
+      <name>GPIO</name>
+      <description>ODP socket-backed bidirectional GPIO controller (32 pins, one bit per pin)</description>
+      <baseAddress>0x10003000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x1000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>GPIO</name>
+        <description>GPIO shared interrupt (PLIC source 4)</description>
+        <value>4</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>IN</name>
+          <description>Input level (one bit per pin, driven by each pin's peer)</description>
+          <addressOffset>0x0</addressOffset>
+          <size>32</size>
+          <access>read-only</access>
+          <resetValue>0x00000000</resetValue>
+          <fields>
+            <field>
+              <name>IN</name>
+              <description>Per-pin input level</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>OUT</name>
+          <description>Output level (one bit per pin, driven to each pin's peer)</description>
+          <addressOffset>0x4</addressOffset>
+          <size>32</size>
+          <resetValue>0x00000000</resetValue>
+          <fields>
+            <field>
+              <name>OUT</name>
+              <description>Per-pin output level</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>IRQ_TRIG</name>
+          <description>Interrupt trigger type (0 = level, 1 = edge)</description>
+          <addressOffset>0x8</addressOffset>
+          <size>32</size>
+          <resetValue>0x00000000</resetValue>
+          <fields>
+            <field>
+              <name>IRQ_TRIG</name>
+              <description>Per-pin trigger select (0 = level, 1 = edge)</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>IRQ_POL</name>
+          <description>Interrupt polarity (0 = low/falling, 1 = high/rising)</description>
+          <addressOffset>0xc</addressOffset>
+          <size>32</size>
+          <resetValue>0x00000000</resetValue>
+          <fields>
+            <field>
+              <name>IRQ_POL</name>
+              <description>Per-pin polarity select (0 = low/falling, 1 = high/rising)</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>IRQ_EN</name>
+          <description>Per-pin interrupt enable</description>
+          <addressOffset>0x10</addressOffset>
+          <size>32</size>
+          <resetValue>0x00000000</resetValue>
+          <fields>
+            <field>
+              <name>IRQ_EN</name>
+              <description>Per-pin interrupt enable</description>
+              <bitRange>[31:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>IRQ_PEND</name>
+          <description>Per-pin interrupt pending (write-1-to-clear)</description>
+          <addressOffset>0x14</addressOffset>
+          <size>32</size>
+          <resetValue>0x00000000</resetValue>
+          <fields>
+            <field>
+              <name>IRQ_PEND</name>
+              <description>Per-pin interrupt pending (write-1-to-clear)</description>
+              <bitRange>[31:0]</bitRange>
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
+            </field>
+          </fields>
+        </register>
+      </registers>
+    </peripheral>
+
   </peripherals>
 </device>

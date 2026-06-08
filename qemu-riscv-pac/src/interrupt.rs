@@ -57,6 +57,8 @@ pub enum ExternalInterrupt {
     I2C0 = 2,
     #[doc = "3 - I2C target interrupt (PLIC source 3)"]
     I2C_TARGET = 3,
+    #[doc = "4 - GPIO shared interrupt (PLIC source 4)"]
+    GPIO = 4,
 }
 #[cfg(feature = "rt")]
 #[riscv_rt::core_interrupt(CoreInterrupt::MachineExternal)]
