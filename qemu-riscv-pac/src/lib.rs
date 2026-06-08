@@ -78,6 +78,15 @@ impl core::fmt::Debug for I2cTarget {
 }
 #[doc = "ODP socket-backed I2C target"]
 pub mod i2c_target;
+#[doc = "ODP socket-backed bidirectional GPIO controller (32 pins, one bit per pin)"]
+pub type Gpio = crate::Periph<gpio::RegisterBlock, 0x1000_3000>;
+impl core::fmt::Debug for Gpio {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("Gpio").finish()
+    }
+}
+#[doc = "ODP socket-backed bidirectional GPIO controller (32 pins, one bit per pin)"]
+pub mod gpio;
 #[unsafe(no_mangle)]
 static mut DEVICE_PERIPHERALS: bool = false;
 #[doc = r" All the peripherals."]
@@ -93,6 +102,8 @@ pub struct Peripherals {
     pub i2c0: I2c0,
     #[doc = "I2C_TARGET"]
     pub i2c_target: I2cTarget,
+    #[doc = "GPIO"]
+    pub gpio: Gpio,
 }
 impl Peripherals {
     #[doc = r" Returns all the peripherals *once*."]
@@ -120,6 +131,7 @@ impl Peripherals {
             uart0: unsafe { Uart0::steal() },
             i2c0: unsafe { I2c0::steal() },
             i2c_target: unsafe { I2cTarget::steal() },
+            gpio: unsafe { Gpio::steal() },
         }
     }
 }
