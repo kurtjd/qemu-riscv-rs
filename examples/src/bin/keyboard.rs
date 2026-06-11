@@ -52,7 +52,7 @@ bind_interrupts!(struct Irqs {
 });
 
 /// 7-bit I2C address the keyboard answers to as a HID-over-I2C device.
-const KB_I2C_ADDR: u8 = 0x42;
+const KB_I2C_ADDR: u8 = 0x2C;
 
 /// UART baud rate. Match this in your terminal (PuTTY: Serial, 115200 8N1).
 const UART_BAUD: u32 = 115_200;
