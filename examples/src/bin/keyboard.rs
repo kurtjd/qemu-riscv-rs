@@ -622,20 +622,26 @@ impl HidKeyboard for UartKeyboard {
 
 /// Adapts our HAL's I2C target driver to the [`hid_service::i2c::I2cSlaveAsync`] trait.
 ///
-/// The HAL reports the transfer direction directly (`Read`/`Write`); START/STOP/repeated-START
-/// framing events are surfaced as `Probe` so the HID host loop simply waits for the next event.
+/// The HAL reports the transfer direction directly (`Read`/`Write`). It also surfaces bus-framing
+/// events (START / repeated-START / STOP / general-call / SMBus alert) as their own `listen`
+/// results *before* the direction of the next sub-transaction. The HID host loop in `hid-service`
+/// expects `listen` to report a real data direction (its `send_response` path only does a single
+/// `listen` and rejects anything that isn't a `Read`), so we swallow framing-only events here and
+/// keep listening until the controller commits to a `Read` or `Write`.
 struct HidI2cSlave(I2c<'static, I2cAsync>);
 
 impl hid_service::i2c::I2cSlaveAsync for HidI2cSlave {
     type Error = core::convert::Infallible;
 
     async fn listen(&mut self) -> Result<hid_service::i2c::Command, Self::Error> {
-        Ok(match self.0.listen().await {
-            TargetRequest::Read(_) => hid_service::i2c::Command::Read,
-            TargetRequest::Write(_) => hid_service::i2c::Command::Write,
-            // Start / RepeatedStart / Stop are framing events with no data direction yet.
-            _ => hid_service::i2c::Command::Probe,
-        })
+        loop {
+            match self.0.listen().await {
+                TargetRequest::Read(_) => return Ok(hid_service::i2c::Command::Read),
+                TargetRequest::Write(_) => return Ok(hid_service::i2c::Command::Write),
+                // Framing-only events carry no data direction yet; wait for the next event.
+                _ => continue,
+            }
+        }
     }
 
     async fn respond_to_write(&mut self, buf: &mut [u8]) -> Result<(), Self::Error> {
