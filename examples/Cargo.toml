@@ -19,14 +19,13 @@ defmt-semihosting = "0.3.0"
 semihosting = { version = "0.1", features = ["panic-handler"] }
 
 # Keyboard demo: HID-over-I2C keyboard service driven by UART input.
-# Pulled from a fork that patches the upstream crates (see the `qemu-kb-patch` branch).
-embedded-services = { git = "https://github.com/kurtjd/embedded-services", branch = "qemu-kb-patch", features = [
+embedded-services = { git = "https://github.com/OpenDevicePartnership/embedded-services", features = [
     "defmt",
 ] }
-hid-service = { git = "https://github.com/kurtjd/embedded-services", branch = "qemu-kb-patch", features = [
+hid-service = { git = "https://github.com/OpenDevicePartnership/embedded-services", features = [
     "defmt",
 ] }
-keyboard-service = { git = "https://github.com/kurtjd/embedded-services", branch = "qemu-kb-patch", features = [
+keyboard-service = { git = "https://github.com/OpenDevicePartnership/embedded-services", features = [
     "defmt",
 ] }
 static_cell = "2.1"
