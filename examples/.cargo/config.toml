@@ -9,17 +9,6 @@ target = "riscv32imac-unknown-none-elf"
 DEFMT_LOG = "trace"
 
 [alias]
-# Run the I2C controller example. Connects to the target's socket, so start
-# `cargo run-target` first.
-run-controller = ["run", "--bin", "i2c-controller"]
-# Run the I2C target example. Hosts the socket the controller connects to.
-run-target = ["run", "--bin", "i2c-target"]
-# Run the GPIO example as the socket master (hosts the GPIO socket).
-# Start this first, then `cargo run-gpio-slave` in another terminal.
-run-gpio-master = ["run", "--bin", "gpio", "--", "master"]
-# Run the GPIO example as the socket slave (connects to the master's socket).
-run-gpio-slave = ["run", "--bin", "gpio", "--", "slave"]
-# Run the UART-driven HID-over-I2C keyboard example. UART0 is exposed as a PTY
-# (path printed at startup) for a terminal like PuTTY; the I2C target and GPIO
-# interrupt line are bridged over sockets for a host running elsewhere.
+# Run the UART-driven HID-over-I2C keyboard example
+# This will print a PTY path which you can connect to from a serial app to send keystrokes
 run-keyboard = ["run", "--bin", "keyboard"]
