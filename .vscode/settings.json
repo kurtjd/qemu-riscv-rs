@@ -13,5 +13,6 @@
     "rust-analyzer.linkedProjects": [
         "qemu-riscv-pac/Cargo.toml",
         "embassy-qemu-riscv/Cargo.toml",
+        "examples/Cargo.toml",
     ]
 }
