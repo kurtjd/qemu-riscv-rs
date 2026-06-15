@@ -1,0 +1,35 @@
+#[doc = "Register `OUT` reader"]
+pub type R = crate::R<OutSpec>;
+#[doc = "Register `OUT` writer"]
+pub type W = crate::W<OutSpec>;
+#[doc = "Field `OUT` reader - Per-pin output level"]
+pub type OutR = crate::FieldReader<u32>;
+#[doc = "Field `OUT` writer - Per-pin output level"]
+pub type OutW<'a, REG> = crate::FieldWriter<'a, REG, 32, u32>;
+impl R {
+    #[doc = "Bits 0:31 - Per-pin output level"]
+    #[inline(always)]
+    pub fn out(&self) -> OutR {
+        OutR::new(self.bits)
+    }
+}
+impl W {
+    #[doc = "Bits 0:31 - Per-pin output level"]
+    #[inline(always)]
+    pub fn out(&mut self) -> OutW<'_, OutSpec> {
+        OutW::new(self, 0)
+    }
+}
+#[doc = "Output level (one bit per pin, driven to each pin's peer)\n\nYou can [`read`](crate::Reg::read) this register and get [`out::R`](R). You can [`reset`](crate::Reg::reset), [`write`](crate::Reg::write), [`write_with_zero`](crate::Reg::write_with_zero) this register using [`out::W`](W). You can also [`modify`](crate::Reg::modify) this register. See [API](https://docs.rs/svd2rust/#read--modify--write-api)."]
+pub struct OutSpec;
+impl crate::RegisterSpec for OutSpec {
+    type Ux = u32;
+}
+#[doc = "`read()` method returns [`out::R`](R) reader structure"]
+impl crate::Readable for OutSpec {}
+#[doc = "`write(|w| ..)` method takes [`out::W`](W) writer structure"]
+impl crate::Writable for OutSpec {
+    type Safety = crate::Unsafe;
+}
+#[doc = "`reset()` method sets OUT to value 0"]
+impl crate::Resettable for OutSpec {}

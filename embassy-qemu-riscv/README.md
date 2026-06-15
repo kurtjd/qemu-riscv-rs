@@ -1,2 +1,3 @@
 # Embassy QEMU-RISCV HAL
-A very minimal Embassy HAL which currently only supports a CLINT mtime time-driver and UART driver.
+An Embassy HAL for the custom RISC-V EC machine in QEMU.  
+Requires a custom build of `qemu-system-riscv32` from: https://github.com/kurtjd/qemu/tree/ec

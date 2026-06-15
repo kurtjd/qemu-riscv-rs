@@ -1,16 +1,52 @@
 #![no_std]
+pub mod gpio;
+pub mod i2c;
 mod interrupt_macros;
 #[cfg(feature = "time-driver")]
 mod time_driver;
 pub mod uart;
 
 // Generate the typelevel interrupt module for all PLIC external interrupts.
-interrupt_mod!(UART0);
+interrupt_mod!(UART0, I2C0, I2C_TARGET, GPIO);
 
 mod chip {
     #[rustfmt::skip]
     embassy_hal_internal::peripherals!(
         UART0,
+        I2C0,
+        I2C_TARGET,
+        GPIO0,
+        GPIO1,
+        GPIO2,
+        GPIO3,
+        GPIO4,
+        GPIO5,
+        GPIO6,
+        GPIO7,
+        GPIO8,
+        GPIO9,
+        GPIO10,
+        GPIO11,
+        GPIO12,
+        GPIO13,
+        GPIO14,
+        GPIO15,
+        GPIO16,
+        GPIO17,
+        GPIO18,
+        GPIO19,
+        GPIO20,
+        GPIO21,
+        GPIO22,
+        GPIO23,
+        GPIO24,
+        GPIO25,
+        GPIO26,
+        GPIO27,
+        GPIO28,
+        GPIO29,
+        GPIO30,
+        GPIO31,
     );
 }
 

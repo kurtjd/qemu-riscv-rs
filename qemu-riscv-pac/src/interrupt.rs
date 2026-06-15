@@ -51,8 +51,14 @@ pub fn cause() -> Trap {
 # [riscv :: pac_enum (unsafe ExternalInterruptNumber)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExternalInterrupt {
-    #[doc = "10 - UART0 interrupt (PLIC source 10)"]
-    UART0 = 10,
+    #[doc = "1 - UART0 interrupt (PLIC source 1)"]
+    UART0 = 1,
+    #[doc = "2 - I2C0 controller interrupt (PLIC source 2)"]
+    I2C0 = 2,
+    #[doc = "3 - I2C target interrupt (PLIC source 3)"]
+    I2C_TARGET = 3,
+    #[doc = "4 - GPIO shared interrupt (PLIC source 4)"]
+    GPIO = 4,
 }
 #[cfg(feature = "rt")]
 #[riscv_rt::core_interrupt(CoreInterrupt::MachineExternal)]

@@ -60,6 +60,33 @@ impl core::fmt::Debug for Uart0 {
 }
 #[doc = "NS16550A compatible UART"]
 pub mod uart0;
+#[doc = "ODP socket-backed I2C controller"]
+pub type I2c0 = crate::Periph<i2c0::RegisterBlock, 0x1000_1000>;
+impl core::fmt::Debug for I2c0 {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("I2c0").finish()
+    }
+}
+#[doc = "ODP socket-backed I2C controller"]
+pub mod i2c0;
+#[doc = "ODP socket-backed I2C target"]
+pub type I2cTarget = crate::Periph<i2c_target::RegisterBlock, 0x1000_2000>;
+impl core::fmt::Debug for I2cTarget {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("I2cTarget").finish()
+    }
+}
+#[doc = "ODP socket-backed I2C target"]
+pub mod i2c_target;
+#[doc = "ODP socket-backed bidirectional GPIO controller (32 pins, one bit per pin)"]
+pub type Gpio = crate::Periph<gpio::RegisterBlock, 0x1000_3000>;
+impl core::fmt::Debug for Gpio {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("Gpio").finish()
+    }
+}
+#[doc = "ODP socket-backed bidirectional GPIO controller (32 pins, one bit per pin)"]
+pub mod gpio;
 #[unsafe(no_mangle)]
 static mut DEVICE_PERIPHERALS: bool = false;
 #[doc = r" All the peripherals."]
@@ -71,6 +98,12 @@ pub struct Peripherals {
     pub plic: Plic,
     #[doc = "UART0"]
     pub uart0: Uart0,
+    #[doc = "I2C0"]
+    pub i2c0: I2c0,
+    #[doc = "I2C_TARGET"]
+    pub i2c_target: I2cTarget,
+    #[doc = "GPIO"]
+    pub gpio: Gpio,
 }
 impl Peripherals {
     #[doc = r" Returns all the peripherals *once*."]
@@ -96,6 +129,9 @@ impl Peripherals {
             clint: unsafe { Clint::steal() },
             plic: unsafe { Plic::steal() },
             uart0: unsafe { Uart0::steal() },
+            i2c0: unsafe { I2c0::steal() },
+            i2c_target: unsafe { I2cTarget::steal() },
+            gpio: unsafe { Gpio::steal() },
         }
     }
 }

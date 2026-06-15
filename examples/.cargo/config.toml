@@ -1,0 +1,14 @@
+[target.riscv32imac-unknown-none-elf]
+runner = "./run.sh"
+rustflags = ["-C", "link-arg=-Tlink.x", "-C", "link-arg=-Tdefmt.x"]
+
+[build]
+target = "riscv32imac-unknown-none-elf"
+
+[env]
+DEFMT_LOG = "trace"
+
+[alias]
+# Run the UART-driven HID-over-I2C keyboard example
+# This will print a PTY path which you can connect to from a serial app to send keystrokes
+run-keyboard = ["run", "--bin", "keyboard"]
