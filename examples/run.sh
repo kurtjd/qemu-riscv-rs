@@ -17,7 +17,7 @@ SOCK="${EC_I2C_SOCK:-/tmp/qemu-ec-i2c.sock}"
 GPIO_SOCK="${EC_GPIO_SOCK:-/tmp/qemu-ec-gpio.sock}"
 
 # CHANGEME: To wherever you built qemu-system-riscv32 using our branch:
-# https://github.com/kurtjd/qemu/tree/ec
+# https://github.com/kurtjd/qemu/tree/odp
 QEMU=~/qemu/build/qemu-system-riscv32
 
 echo "Connect your terminal (e.g. picocom) to the PTY printed below, at 115200 8N1." >&2
