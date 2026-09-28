@@ -1,4 +1,5 @@
 #![no_std]
+pub mod espi;
 pub mod gpio;
 pub mod i2c;
 mod interrupt_macros;
@@ -7,7 +8,7 @@ mod time_driver;
 pub mod uart;
 
 // Generate the typelevel interrupt module for all PLIC external interrupts.
-interrupt_mod!(UART0, I2C0, I2C_TARGET, GPIO);
+interrupt_mod!(UART0, I2C0, I2C_TARGET, GPIO, ESPI_TARGET);
 
 mod chip {
     #[rustfmt::skip]
@@ -15,6 +16,7 @@ mod chip {
         UART0,
         I2C0,
         I2C_TARGET,
+        ESPI_TARGET,
         GPIO0,
         GPIO1,
         GPIO2,

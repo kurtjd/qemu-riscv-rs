@@ -1078,5 +1078,117 @@
       </registers>
     </peripheral>
 
+    <!-- ================================================================ -->
+    <!-- ESPI_TARGET - Socket-backed eSPI target                          -->
+    <!-- ================================================================ -->
+    <peripheral>
+      <name>ESPI_TARGET</name>
+      <description>ODP socket-backed eSPI target. Registers require aligned 32-bit accesses. Host addresses are independent of the EC mailbox memory windows.</description>
+      <baseAddress>0x10004000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x1000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <interrupt>
+        <name>ESPI_TARGET</name>
+        <description>eSPI target shared level interrupt (PLIC source 5)</description>
+        <value>5</value>
+      </interrupt>
+      <registers>
+        <register>
+          <name>CONTROL</name>
+          <description>Enable peripheral-channel mailbox access. Program all three decode bases while disabled; enabling requires distinct, 4-KiB-aligned bases.</description>
+          <addressOffset>0x00</addressOffset>
+          <resetValue>0</resetValue>
+          <fields>
+            <field>
+              <name>ENABLE</name>
+              <description>Enable host access to mailbox data and control windows</description>
+              <bitRange>[0:0]</bitRange>
+            </field>
+          </fields>
+        </register>
+        <register>
+          <name>MAILBOX0_ADDR</name>
+          <description>Mailbox zero host decode base, not an EC pointer. Must be 4-KiB aligned and distinct from the other bases. Change only while CONTROL.ENABLE is zero.</description>
+          <addressOffset>0x04</addressOffset>
+          <resetValue>0</resetValue>
+        </register>
+        <register>
+          <name>MAILBOX1_ADDR</name>
+          <description>Mailbox one host decode base, not an EC pointer. Must be 4-KiB aligned and distinct from the other bases. Change only while CONTROL.ENABLE is zero.</description>
+          <addressOffset>0x08</addressOffset>
+          <resetValue>0</resetValue>
+        </register>
+        <register>
+          <name>CONTROL_ADDR</name>
+          <description>Host control-window decode base, not an EC pointer. Must be 4-KiB aligned and distinct from the mailbox bases. Change only while CONTROL.ENABLE is zero.</description>
+          <addressOffset>0x0c</addressOffset>
+          <resetValue>0</resetValue>
+        </register>
+        <cluster>
+          <dim>2</dim>
+          <dimIncrement>0x0c</dimIncrement>
+          <name>MAILBOX_CONTROL[%s]</name>
+          <description>EC mailbox-control registers with 0x0c stride. Host control groups use 0x20 stride and expose IRQ acknowledgement instead of IRQ set.</description>
+          <addressOffset>0x10</addressOffset>
+          <register>
+            <name>SHARED_STATUS</name>
+            <description>Application-defined shared status, writable by EC and host</description>
+            <addressOffset>0x00</addressOffset>
+            <resetValue>0</resetValue>
+          </register>
+          <register>
+            <name>DOORBELL</name>
+            <description>Host-to-EC doorbell pending. EC writes bit zero as one to clear; pending doorbells assert PLIC source 5.</description>
+            <addressOffset>0x04</addressOffset>
+            <resetValue>0</resetValue>
+            <modifiedWriteValues>oneToClear</modifiedWriteValues>
+            <fields>
+              <field><name>PENDING</name><bitRange>[0:0]</bitRange></field>
+            </fields>
+          </register>
+          <register>
+            <name>IRQ_SET</name>
+            <description>Read host IRQ pending; write one to assert host IRQ</description>
+            <addressOffset>0x08</addressOffset>
+            <resetValue>0</resetValue>
+            <modifiedWriteValues>oneToSet</modifiedWriteValues>
+            <fields>
+              <field><name>PENDING</name><bitRange>[0:0]</bitRange></field>
+            </fields>
+          </register>
+        </cluster>
+      </registers>
+    </peripheral>
+    <peripheral>
+      <name>ESPI_MAILBOX0</name>
+      <description>Fixed 4-KiB EC view of eSPI mailbox zero RAM. The host decode base does not relocate this window. Supports aligned 8-, 16- and 32-bit accesses; data accesses do not ring the doorbell.</description>
+      <baseAddress>0x10005000</baseAddress>
+      <addressBlock>
+        <offset>0</offset>
+        <size>0x1000</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <registers>
+        <register>
+          <dim>4096</dim>
+          <dimIncrement>1</dimIncrement>
+          <name>DATA[%s]</name>
+          <description>Shared mailbox byte; the host may update memory independently of the EC</description>
+          <addressOffset>0</addressOffset>
+          <size>8</size>
+          <resetValue>0</resetValue>
+          <resetMask>0xff</resetMask>
+        </register>
+      </registers>
+    </peripheral>
+    <peripheral derivedFrom="ESPI_MAILBOX0">
+      <name>ESPI_MAILBOX1</name>
+      <description>Fixed EC view of eSPI mailbox one RAM, independent of its configurable host address</description>
+      <baseAddress>0x10006000</baseAddress>
+    </peripheral>
+
   </peripherals>
 </device>
