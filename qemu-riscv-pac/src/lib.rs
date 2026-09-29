@@ -87,6 +87,33 @@ impl core::fmt::Debug for Gpio {
 }
 #[doc = "ODP socket-backed bidirectional GPIO controller (32 pins, one bit per pin)"]
 pub mod gpio;
+#[doc = "ODP socket-backed eSPI target. Registers require aligned 32-bit accesses. Host addresses are independent of the EC mailbox memory windows."]
+pub type EspiTarget = crate::Periph<espi_target::RegisterBlock, 0x1000_4000>;
+impl core::fmt::Debug for EspiTarget {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("EspiTarget").finish()
+    }
+}
+#[doc = "ODP socket-backed eSPI target. Registers require aligned 32-bit accesses. Host addresses are independent of the EC mailbox memory windows."]
+pub mod espi_target;
+#[doc = "Fixed 4-KiB EC view of eSPI mailbox zero RAM. The host decode base does not relocate this window. Supports aligned 8-, 16- and 32-bit accesses; data accesses do not ring the doorbell."]
+pub type EspiMailbox0 = crate::Periph<espi_mailbox0::RegisterBlock, 0x1000_5000>;
+impl core::fmt::Debug for EspiMailbox0 {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("EspiMailbox0").finish()
+    }
+}
+#[doc = "Fixed 4-KiB EC view of eSPI mailbox zero RAM. The host decode base does not relocate this window. Supports aligned 8-, 16- and 32-bit accesses; data accesses do not ring the doorbell."]
+pub mod espi_mailbox0;
+#[doc = "Fixed EC view of eSPI mailbox one RAM, independent of its configurable host address"]
+pub type EspiMailbox1 = crate::Periph<espi_mailbox0::RegisterBlock, 0x1000_6000>;
+impl core::fmt::Debug for EspiMailbox1 {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        f.debug_struct("EspiMailbox1").finish()
+    }
+}
+#[doc = "Fixed EC view of eSPI mailbox one RAM, independent of its configurable host address"]
+pub use self::espi_mailbox0 as espi_mailbox1;
 #[unsafe(no_mangle)]
 static mut DEVICE_PERIPHERALS: bool = false;
 #[doc = r" All the peripherals."]
@@ -104,6 +131,12 @@ pub struct Peripherals {
     pub i2c_target: I2cTarget,
     #[doc = "GPIO"]
     pub gpio: Gpio,
+    #[doc = "ESPI_TARGET"]
+    pub espi_target: EspiTarget,
+    #[doc = "ESPI_MAILBOX0"]
+    pub espi_mailbox0: EspiMailbox0,
+    #[doc = "ESPI_MAILBOX1"]
+    pub espi_mailbox1: EspiMailbox1,
 }
 impl Peripherals {
     #[doc = r" Returns all the peripherals *once*."]
@@ -132,6 +165,9 @@ impl Peripherals {
             i2c0: unsafe { I2c0::steal() },
             i2c_target: unsafe { I2cTarget::steal() },
             gpio: unsafe { Gpio::steal() },
+            espi_target: unsafe { EspiTarget::steal() },
+            espi_mailbox0: unsafe { EspiMailbox0::steal() },
+            espi_mailbox1: unsafe { EspiMailbox1::steal() },
         }
     }
 }
