@@ -6,9 +6,9 @@
 //! [`asynch`](embedded_mcu_hal::i2c::target::asynch::I2c)).
 //!
 //! The application drives the device with the `listen` → `respond` → re-`listen` loop:
-//! [`listen`](Self::listen) waits for the controller to address the target and reports
-//! the [`Request`], then [`respond_to_write`](Self::respond_to_write) /
-//! [`respond_to_read`](Self::respond_to_read) drain or fill bytes until the transfer
+//! [`listen`](I2c::listen) waits for the controller to address the target and reports
+//! the [`Request`], then [`respond_to_write`](I2c::respond_to_write) /
+//! [`respond_to_read`](I2c::respond_to_read) drain or fill bytes until the transfer
 //! terminates.
 //!
 //! The device matches a single configured 7-bit address. An unmatched address is
@@ -100,34 +100,22 @@ impl<'d, M: Mode> I2c<'d, M> {
     // Clear a write-1-to-clear STATUS bit without disturbing the others.
     #[inline]
     fn clear_start(&mut self) {
-        self.info
-            .reg()
-            .status()
-            .write(|w| w.start().clear_bit_by_one());
+        self.info.reg().status().write(|w| w.start().clear_bit_by_one());
     }
 
     #[inline]
     fn clear_stop(&mut self) {
-        self.info
-            .reg()
-            .status()
-            .write(|w| w.stop().clear_bit_by_one());
+        self.info.reg().status().write(|w| w.stop().clear_bit_by_one());
     }
 
     #[inline]
     fn clear_restart(&mut self) {
-        self.info
-            .reg()
-            .status()
-            .write(|w| w.restart().clear_bit_by_one());
+        self.info.reg().status().write(|w| w.restart().clear_bit_by_one());
     }
 
     #[inline]
     fn clear_tx_done(&mut self) {
-        self.info
-            .reg()
-            .status()
-            .write(|w| w.tx_done().clear_bit_by_one());
+        self.info.reg().status().write(|w| w.tx_done().clear_bit_by_one());
     }
 
     // Inspect the latched START status and turn it into a Request, advancing the
@@ -225,10 +213,7 @@ impl<'d> I2c<'d, Blocking> {
         let mut sent = 0;
         for &byte in buf {
             // SAFETY: Any u8 value is valid for the DATA register.
-            self.info
-                .reg()
-                .data()
-                .write(|w| unsafe { w.data().bits(byte) });
+            self.info.reg().data().write(|w| unsafe { w.data().bits(byte) });
 
             loop {
                 let status = self.info.reg().status().read();
@@ -278,11 +263,7 @@ impl<'d> I2c<'d, Async> {
             self.info.waker.register(cx.waker());
 
             let status = self.info.reg().status().read();
-            if status.start().bit()
-                || status.stop().bit()
-                || status.rx_rdy().bit()
-                || status.tx_done().bit()
-            {
+            if status.start().bit() || status.stop().bit() || status.rx_rdy().bit() || status.tx_done().bit() {
                 Poll::Ready(())
             } else {
                 // (Re-)enable all event interrupts and wait for the handler.
@@ -368,10 +349,7 @@ impl<'d> I2c<'d, Async> {
         let mut sent = 0;
         for &byte in buf {
             // SAFETY: Any u8 value is valid for the DATA register.
-            self.info
-                .reg()
-                .data()
-                .write(|w| unsafe { w.data().bits(byte) });
+            self.info.reg().data().write(|w| unsafe { w.data().bits(byte) });
 
             loop {
                 let status = self.info.reg().status().read();

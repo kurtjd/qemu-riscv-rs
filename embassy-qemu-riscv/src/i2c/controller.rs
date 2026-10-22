@@ -40,9 +40,7 @@ pub(crate) fn plic_enable_i2c0() {
 
     // SAFETY: We have sole control of PLIC configuration for I2C0
     unsafe {
-        plic()
-            .priorities()
-            .set_priority(ExternalInterrupt::I2C0, Priority::P1);
+        plic().priorities().set_priority(ExternalInterrupt::I2C0, Priority::P1);
         plic().ctx0().enables().enable(ExternalInterrupt::I2C0);
     }
 }
@@ -279,10 +277,7 @@ impl<'d> I2c<'d, Blocking> {
 
 impl<'d> I2c<'d, Async> {
     /// Create a new async I2C controller driver instance.
-    pub fn new_async<T: Instance>(
-        _peri: Peri<'d, T>,
-        _irq: impl Binding<T::Interrupt, InterruptHandler<T>>,
-    ) -> Self {
+    pub fn new_async<T: Instance>(_peri: Peri<'d, T>, _irq: impl Binding<T::Interrupt, InterruptHandler<T>>) -> Self {
         let i2c = Self::new_inner::<T>();
         plic_enable_i2c0();
         i2c
@@ -298,10 +293,7 @@ impl<'d> I2c<'d, Async> {
             } else {
                 // (Re-)enable the command-complete interrupt and wait for the handler.
                 critical_section::with(|_| {
-                    self.info
-                        .reg()
-                        .ctrl()
-                        .modify(|_, w| w.cmd_done_ie().set_bit());
+                    self.info.reg().ctrl().modify(|_, w| w.cmd_done_ie().set_bit());
                 });
                 Poll::Pending
             }
@@ -412,12 +404,7 @@ impl<'d> I2c<'d, Async> {
     /// # Errors
     ///
     /// See [`Self::transaction`].
-    pub async fn write_read(
-        &mut self,
-        address: u8,
-        bytes: &[u8],
-        buf: &mut [u8],
-    ) -> Result<(), Error> {
+    pub async fn write_read(&mut self, address: u8, bytes: &[u8], buf: &mut [u8]) -> Result<(), Error> {
         self.transaction(
             address,
             &mut [

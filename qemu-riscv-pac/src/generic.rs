@@ -242,8 +242,7 @@ pub struct RangeFrom<const MIN: u64>;
 #[doc = " Marker for field writers are safe to write in specified inclusive range"]
 pub struct RangeTo<const MAX: u64>;
 #[doc = " Write field Proxy"]
-pub type FieldWriter<'a, REG, const WI: u8, FI = u8, Safety = Unsafe> =
-    raw::FieldWriter<'a, REG, WI, FI, Safety>;
+pub type FieldWriter<'a, REG, const WI: u8, FI = u8, Safety = Unsafe> = raw::FieldWriter<'a, REG, WI, FI, Safety>;
 impl<REG, const WI: u8, FI, Safety> FieldWriter<'_, REG, WI, FI, Safety>
 where
     REG: Writable + RegisterSpec,
@@ -292,8 +291,7 @@ where
         unsafe { self.bits(value) }
     }
 }
-impl<'a, REG, const WI: u8, FI, const MIN: u64, const MAX: u64>
-    FieldWriter<'a, REG, WI, FI, Range<MIN, MAX>>
+impl<'a, REG, const WI: u8, FI, const MIN: u64, const MAX: u64> FieldWriter<'a, REG, WI, FI, Range<MIN, MAX>>
 where
     REG: Writable + RegisterSpec,
     FI: FieldSpec,
@@ -567,8 +565,7 @@ impl<REG: Resettable + Writable> Reg<REG> {
         F: FnOnce(&mut W<REG>) -> &mut W<REG>,
     {
         let value = f(&mut W {
-            bits: REG::RESET_VALUE & !REG::ONE_TO_MODIFY_FIELDS_BITMAP
-                | REG::ZERO_TO_MODIFY_FIELDS_BITMAP,
+            bits: REG::RESET_VALUE & !REG::ONE_TO_MODIFY_FIELDS_BITMAP | REG::ZERO_TO_MODIFY_FIELDS_BITMAP,
             _reg: marker::PhantomData,
         })
         .bits;
@@ -609,8 +606,7 @@ impl<REG: Resettable + Writable> Reg<REG> {
         F: FnOnce(&mut W<REG>) -> T,
     {
         let mut writer = W {
-            bits: REG::RESET_VALUE & !REG::ONE_TO_MODIFY_FIELDS_BITMAP
-                | REG::ZERO_TO_MODIFY_FIELDS_BITMAP,
+            bits: REG::RESET_VALUE & !REG::ONE_TO_MODIFY_FIELDS_BITMAP | REG::ZERO_TO_MODIFY_FIELDS_BITMAP,
             _reg: marker::PhantomData,
         };
         let result = f(&mut writer);

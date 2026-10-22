@@ -1,12 +1,13 @@
 [package]
 name = "embassy-qemu-riscv"
 version = "0.2.1"
-edition = "2024"
+edition.workspace = true
+rust-version.workspace = true
 description = "Embassy Hardware Abstraction Layer (HAL) for the QEMU RISC-V platform"
-authors = ["Kurtis Dinelle <kurtis.dinelle@gmail.com>"]
-license = "MIT"
+authors.workspace = true
+license.workspace = true
 keywords = ["embedded", "hal", "risc-v", "qemu", "embassy"]
-repository = "https://github.com/kurtjd/qemu-riscv-rs"
+repository.workspace = true
 
 [features]
 default = ["time-driver", "rt"]
@@ -17,25 +18,23 @@ v-trap = ["rt", "qemu-riscv-pac/v-trap"]
 time-driver = ["dep:embassy-time-driver", "dep:embassy-time-queue-utils", "rt"]
 
 [dependencies]
-qemu-riscv-pac = { version = "0.1.0", path = "../qemu-riscv-pac", features = [
+qemu-riscv-pac = { workspace = true, features = [
     "critical-section",
 ] }
-riscv = { version = "0.16.0", features = ["critical-section-single-hart"] }
-riscv-rt = { version = "0.17.0", optional = true }
-critical-section = { version = "1.2.0" }
-defmt = { version = "1.0.1", optional = true }
+riscv = { workspace = true, features = ["critical-section-single-hart"] }
+riscv-rt = { workspace = true, optional = true }
+critical-section.workspace = true
+defmt = { workspace = true, optional = true }
 
-embassy-time-driver = { version = "0.2.1", features = [
+embassy-time-driver = { workspace = true, features = [
     "tick-hz-10_000_000",
 ], optional = true }
-embassy-time-queue-utils = { version = "0.3.0", optional = true }
-embassy-sync = "0.7.2"
-embassy-futures = "0.1.2"
-embassy-hal-internal = "0.4.0"
-embassy-executor = "0.9.1"
+embassy-time-queue-utils = { workspace = true, optional = true }
+embassy-sync.workspace = true
+embassy-hal-internal.workspace = true
 
-embedded-hal = { package = "embedded-hal", version = "1.0" }
-embedded-hal-async = "1.0"
-embedded-io = "0.7.1"
-embedded-io-async = "0.7.0"
-embedded-mcu-hal = "0.3.0"
+embedded-hal.workspace = true
+embedded-hal-async.workspace = true
+embedded-io.workspace = true
+embedded-io-async.workspace = true
+embedded-mcu-hal.workspace = true

@@ -2,10 +2,10 @@
 //!
 //! Drives the socket-backed bidirectional GPIO peripheral (`GPIO`) and implements the
 //! [`embedded-hal`](embedded_hal) digital traits
-//! ([`InputPin`](embedded_hal::digital::InputPin),
-//! [`OutputPin`](embedded_hal::digital::OutputPin),
-//! [`StatefulOutputPin`](embedded_hal::digital::StatefulOutputPin)) for blocking use and the
-//! [`embedded-hal-async`](embedded_hal_async) [`Wait`](embedded_hal_async::digital::Wait) trait
+//! ([`InputPin`],
+//! [`OutputPin`],
+//! [`StatefulOutputPin`]) for blocking use and the
+//! [`embedded-hal-async`](embedded_hal_async) [`Wait`] trait
 //! for awaiting input edges/levels.
 //!
 //! Each of the 32 pins is an independent wire bridged to a peer: the guest drives an output
@@ -48,9 +48,7 @@ pub(crate) fn plic_enable_gpio() {
 
     // SAFETY: We have sole control of PLIC configuration for GPIO
     unsafe {
-        plic()
-            .priorities()
-            .set_priority(ExternalInterrupt::GPIO, Priority::P1);
+        plic().priorities().set_priority(ExternalInterrupt::GPIO, Priority::P1);
         plic().ctx0().enables().enable(ExternalInterrupt::GPIO);
     }
 }
@@ -79,8 +77,7 @@ impl crate::interrupt::typelevel::Handler<crate::interrupt::typelevel::GPIO> for
         // Disable the enables for the firing pins. This de-asserts the shared (level-triggered)
         // line and stops it re-firing; the awaiting task observes the cleared enable bit,
         // services the event, and re-arms the next time it waits.
-        reg.irq_en()
-            .modify(|r, w| unsafe { w.bits(r.bits() & !active) });
+        reg.irq_en().modify(|r, w| unsafe { w.bits(r.bits() & !active) });
         // Clear the edge-latched pending bits (write-1-to-clear).
         reg.irq_pend().write(|w| unsafe { w.bits(active) });
 
@@ -178,9 +175,7 @@ impl<M: Mode> Flex<'_, M> {
     pub fn set_high(&mut self) {
         let mask = self.mask();
         critical_section::with(|_| {
-            reg()
-                .out()
-                .modify(|r, w| unsafe { w.bits(r.bits() | mask) });
+            reg().out().modify(|r, w| unsafe { w.bits(r.bits() | mask) });
         });
     }
 
@@ -189,9 +184,7 @@ impl<M: Mode> Flex<'_, M> {
     pub fn set_low(&mut self) {
         let mask = self.mask();
         critical_section::with(|_| {
-            reg()
-                .out()
-                .modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
+            reg().out().modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
         });
     }
 
@@ -209,9 +202,7 @@ impl<M: Mode> Flex<'_, M> {
     pub fn toggle(&mut self) {
         let mask = self.mask();
         critical_section::with(|_| {
-            reg()
-                .out()
-                .modify(|r, w| unsafe { w.bits(r.bits() ^ mask) });
+            reg().out().modify(|r, w| unsafe { w.bits(r.bits() ^ mask) });
         });
     }
 
@@ -246,25 +237,19 @@ impl Flex<'_, Async> {
             if (reg().in_().read().bits() & mask != 0) == want_high {
                 // Already at the desired level; make sure our interrupt is disarmed.
                 critical_section::with(|_| {
-                    reg()
-                        .irq_en()
-                        .modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
+                    reg().irq_en().modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
                 });
                 return Poll::Ready(());
             }
 
             // Arm: level trigger, requested polarity, enable.
             critical_section::with(|_| {
-                reg()
-                    .irq_trig()
-                    .modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
+                reg().irq_trig().modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
                 reg().irq_pol().modify(|r, w| unsafe {
                     let v = r.bits();
                     w.bits(if want_high { v | mask } else { v & !mask })
                 });
-                reg()
-                    .irq_en()
-                    .modify(|r, w| unsafe { w.bits(r.bits() | mask) });
+                reg().irq_en().modify(|r, w| unsafe { w.bits(r.bits() | mask) });
             });
             Poll::Pending
         })
@@ -285,17 +270,13 @@ impl Flex<'_, Async> {
 
         // Arm: edge trigger, requested polarity, clear any stale latch, enable.
         critical_section::with(|_| {
-            reg()
-                .irq_trig()
-                .modify(|r, w| unsafe { w.bits(r.bits() | mask) });
+            reg().irq_trig().modify(|r, w| unsafe { w.bits(r.bits() | mask) });
             reg().irq_pol().modify(|r, w| unsafe {
                 let v = r.bits();
                 w.bits(if want_rising { v | mask } else { v & !mask })
             });
             reg().irq_pend().write(|w| unsafe { w.bits(mask) });
-            reg()
-                .irq_en()
-                .modify(|r, w| unsafe { w.bits(r.bits() | mask) });
+            reg().irq_en().modify(|r, w| unsafe { w.bits(r.bits() | mask) });
         });
 
         poll_fn(|cx| {
@@ -341,9 +322,7 @@ impl<M: Mode> Drop for Flex<'_, M> {
         // Disarm the pin's interrupt and clear any latched pending bit.
         let mask = self.mask();
         critical_section::with(|_| {
-            reg()
-                .irq_en()
-                .modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
+            reg().irq_en().modify(|r, w| unsafe { w.bits(r.bits() & !mask) });
             reg().irq_pend().write(|w| unsafe { w.bits(mask) });
         });
     }

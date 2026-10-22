@@ -25,9 +25,7 @@ pub(crate) fn plic_enable_uart0() {
 
     // SAFETY: We have sole control of PLIC configuration for UART0
     unsafe {
-        plic()
-            .priorities()
-            .set_priority(ExternalInterrupt::UART0, Priority::P1);
+        plic().priorities().set_priority(ExternalInterrupt::UART0, Priority::P1);
         plic().ctx0().enables().enable(ExternalInterrupt::UART0);
     }
 }
@@ -180,9 +178,7 @@ impl core::error::Error for Error {}
 
 fn init(reg: &uart0::RegisterBlock, config: Config) -> Result<(), Error> {
     // Calculate baud rate divisor: baud = clock / (16 * divisor)
-    let divisor = UART_CLK
-        .checked_div(16 * config.baudrate)
-        .ok_or(Error::InvalidBaud)?;
+    let divisor = UART_CLK.checked_div(16 * config.baudrate).ok_or(Error::InvalidBaud)?;
 
     if divisor == 0 || divisor > u16::MAX as u32 {
         return Err(Error::InvalidBaud);
@@ -565,11 +561,7 @@ impl<'d, M: Mode> UartTx<'d, M> {
     fn write_chunk(&mut self, chunk: &[u8]) {
         for byte in chunk {
             // SAFETY: Any u8 value is valid for the THR register.
-            self.info
-                .reg()
-                .data()
-                .thr()
-                .write(|w| unsafe { w.bits(*byte) });
+            self.info.reg().data().thr().write(|w| unsafe { w.bits(*byte) });
         }
     }
 
@@ -634,11 +626,7 @@ impl<'d> UartTx<'d, Async> {
                 Poll::Ready(())
             } else {
                 critical_section::with(|_| {
-                    self.info
-                        .reg()
-                        .data()
-                        .ier()
-                        .modify(|_, w| w.etbei().set_bit());
+                    self.info.reg().data().ier().modify(|_, w| w.etbei().set_bit());
                 });
                 Poll::Pending
             }

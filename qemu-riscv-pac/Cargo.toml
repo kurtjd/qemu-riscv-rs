@@ -1,22 +1,26 @@
 [package]
 name = "qemu-riscv-pac"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
 description = "Peripheral Access Crate (PAC) for the QEMU RISC-V virt platform"
-authors = ["Kurtis Dinelle <kurtis.dinelle@gmail.com>"]
-license = "MIT"
+authors.workspace = true
+license.workspace = true
 keywords = ["embedded", "risc-v", "qemu", "pac", "no-std"]
-repository = "https://github.com/kurtjd/qemu-riscv-rs"
+repository.workspace = true
+
+[package.metadata.cargo-machete]
+ignored = ["riscv-peripheral"] # Used by the generated CLINT and PLIC macros.
 
 [dependencies]
-critical-section = { version = "1.2.0", optional = true }
-riscv = "0.16.0"
-riscv-peripheral = "0.5.0"
-riscv-rt = { version = "0.17.0", features = [
+critical-section = { workspace = true, optional = true }
+riscv.workspace = true
+riscv-peripheral.workspace = true
+riscv-rt = { workspace = true, features = [
     "device",
     "memory",
 ], optional = true }
-vcell = "0.1.3"
+vcell.workspace = true
 
 [features]
 rt = ["riscv-rt"]
