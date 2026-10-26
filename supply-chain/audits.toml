@@ -1,0 +1,14 @@
+
+# cargo-vet audits file
+
+[[audits.riscv-target-parser]]
+who = "Kurtis Dinelle <kdinelle@microsoft.com>"
+criteria = "safe-to-deploy"
+version = "0.1.3"
+notes = "Full source review for the advertised trusted build-input usage: no unsafe code, external dependencies, build script, proc macros, or direct ambient I/O. Malformed inputs can panic; extended extension names are not sanitized for arbitrary Cargo output, so this is not approval as a hardened untrusted-runtime parser. The current runtime consumer allowlists emitted cfg names and LLVM helper strings are bounded. Static review with tests read, not executed. Package archive checksum and packaged source files verified against Cargo.lock. Source review performed by a cargo-vet-auditor subagent and assessed by the orchestrator. Assisted-by: Copilot SDK in VS Code:gpt-6.1-sol cargo-vet. Orchestrator model identity confirmed by the user; source-review subagent model ID was unavailable."
+
+[[audits.riscv-types]]
+who = "Kurtis Dinelle <kdinelle@microsoft.com>"
+criteria = "safe-to-deploy"
+version = "0.1.0"
+notes = "Full source review: six unsafe traits require unsafe implementations to uphold numeric invariants; supplied example conversions reject invalid values. No unchecked memory operations, external dependencies, build scripts, proc macros, or ambient I/O. Static review with tests read, not executed. Package archive checksum and packaged source files verified against Cargo.lock. Source review performed by a cargo-vet-auditor subagent and assessed by the orchestrator. Assisted-by: Copilot SDK in VS Code:gpt-6.1-sol cargo-vet. Orchestrator model identity confirmed by the user; source-review subagent model ID was unavailable."

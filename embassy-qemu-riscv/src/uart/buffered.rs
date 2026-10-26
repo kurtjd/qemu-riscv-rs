@@ -8,9 +8,7 @@
 //! The user provides a `&mut [u8]` buffer at construction time. The larger the buffer, the more
 //! time the application has to read data before the buffer fills and new data is lost.
 
-use super::{
-    Async, Blocking, Config, Error, FIFO_SZ, InterruptType, Mode, int_flag, plic_enable_uart0,
-};
+use super::{Async, Blocking, Config, Error, FIFO_SZ, InterruptType, Mode, int_flag, plic_enable_uart0};
 use crate::interrupt::typelevel::{Binding, Interrupt};
 use crate::pac::uart0;
 use crate::{pac, peripherals};
@@ -135,11 +133,7 @@ impl<'d> Uart<'d, Blocking> {
     /// # Errors
     ///
     /// Returns [`Error::InvalidBaud`] if the supplied baud rate can not be represented.
-    pub fn new_blocking<T: Instance>(
-        _peri: Peri<'d, T>,
-        rx_buf: &'d mut [u8],
-        config: Config,
-    ) -> Result<Self, Error> {
+    pub fn new_blocking<T: Instance>(_peri: Peri<'d, T>, rx_buf: &'d mut [u8], config: Config) -> Result<Self, Error> {
         Self::new_inner::<T>(rx_buf, config)
     }
 }
@@ -252,11 +246,7 @@ impl<'d> UartRx<'d, Blocking> {
     ///
     /// Returns [`Error::InvalidBaud`] if the supplied baud rate can not be represented by
     /// given clock source.
-    pub fn new_blocking<T: Instance>(
-        _peri: Peri<'d, T>,
-        rx_buf: &'d mut [u8],
-        config: Config,
-    ) -> Result<Self, Error> {
+    pub fn new_blocking<T: Instance>(_peri: Peri<'d, T>, rx_buf: &'d mut [u8], config: Config) -> Result<Self, Error> {
         super::init(T::info().reg(), config)?;
         Ok(Self::new_inner::<T>(rx_buf))
     }
@@ -342,11 +332,7 @@ impl<'d, M: Mode> UartTx<'d, M> {
     fn write_chunk(&mut self, chunk: &[u8]) {
         for byte in chunk {
             // SAFETY: Any u8 value is valid for the THR register.
-            self.info
-                .reg()
-                .data()
-                .thr()
-                .write(|w| unsafe { w.bits(*byte) });
+            self.info.reg().data().thr().write(|w| unsafe { w.bits(*byte) });
         }
     }
 
@@ -409,11 +395,7 @@ impl<'d> UartTx<'d, Async> {
                 Poll::Ready(())
             } else {
                 critical_section::with(|_| {
-                    self.info
-                        .reg()
-                        .data()
-                        .ier()
-                        .modify(|_, w| w.etbei().set_bit());
+                    self.info.reg().data().ier().modify(|_, w| w.etbei().set_bit());
                 });
                 Poll::Pending
             }

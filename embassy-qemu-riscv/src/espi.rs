@@ -188,10 +188,7 @@ impl<'d, Mode: self::Mode> Espi<'d, Mode> {
         if enabled {
             self.config().validate()?;
         }
-        self.info
-            .reg()
-            .control()
-            .write(|writer| writer.enable().bit(enabled));
+        self.info.reg().control().write(|writer| writer.enable().bit(enabled));
         io_fence();
         if self.is_enabled() != enabled {
             return Err(Error::ConfigurationRejected);
@@ -218,12 +215,7 @@ impl<'d, Mode: self::Mode> Espi<'d, Mode> {
     /// Copy shared bytes into a caller-owned buffer. The range must fit the
     /// fixed 4096-byte mailbox. Host writes are not an atomic snapshot: use a
     /// host/firmware handshake when the buffer must remain stable during copying.
-    pub fn read_mailbox(
-        &mut self,
-        mailbox: Mailbox,
-        offset: usize,
-        buffer: &mut [u8],
-    ) -> Result<(), Error> {
+    pub fn read_mailbox(&mut self, mailbox: Mailbox, offset: usize, buffer: &mut [u8]) -> Result<(), Error> {
         let range = checked_range(offset, buffer.len(), MAILBOX_CAPACITY)?;
         let memory = self.info.memory(mailbox);
         io_fence();
@@ -237,19 +229,12 @@ impl<'d, Mode: self::Mode> Espi<'d, Mode> {
     /// Copy bytes to the fixed EC window with volatile accesses. This does not
     /// itself notify the host; publish shared status or raise its IRQ afterwards.
     /// The host must not concurrently use the same bytes.
-    pub fn write_mailbox(
-        &mut self,
-        mailbox: Mailbox,
-        offset: usize,
-        buffer: &[u8],
-    ) -> Result<(), Error> {
+    pub fn write_mailbox(&mut self, mailbox: Mailbox, offset: usize, buffer: &[u8]) -> Result<(), Error> {
         let range = checked_range(offset, buffer.len(), MAILBOX_CAPACITY)?;
         let memory = self.info.memory(mailbox);
         io_fence();
         for (&byte, index) in buffer.iter().zip(range) {
-            memory
-                .data(index)
-                .write(|writer| unsafe { writer.bits(byte) });
+            memory.data(index).write(|writer| unsafe { writer.bits(byte) });
         }
         io_fence();
         Ok(())
@@ -563,10 +548,7 @@ mod tests {
         for mailbox in Mailbox::ALL {
             let mut config = Config::default();
             config.mailbox_addresses[mailbox.index()] += 1;
-            assert_eq!(
-                config.validate(),
-                Err(Error::UnalignedMailboxAddress(mailbox))
-            );
+            assert_eq!(config.validate(), Err(Error::UnalignedMailboxAddress(mailbox)));
         }
         let mut config = Config::default();
         config.control_address += 1;
@@ -670,19 +652,13 @@ mod tests {
         let mut buffer = [0; MAILBOX_CAPACITY];
         for mailbox in Mailbox::ALL {
             let value = 0x5a + mailbox.index() as u8;
-            driver
-                .write_mailbox(mailbox, 0, &[value; MAILBOX_CAPACITY])
-                .unwrap();
+            driver.write_mailbox(mailbox, 0, &[value; MAILBOX_CAPACITY]).unwrap();
         }
         for mailbox in Mailbox::ALL {
             driver.read_mailbox(mailbox, 0, &mut buffer).unwrap();
             assert_eq!(buffer, [0x5a + mailbox.index() as u8; MAILBOX_CAPACITY]);
-            driver
-                .write_mailbox(mailbox, MAILBOX_CAPACITY, &[])
-                .unwrap();
-            driver
-                .read_mailbox(mailbox, MAILBOX_CAPACITY, &mut [])
-                .unwrap();
+            driver.write_mailbox(mailbox, MAILBOX_CAPACITY, &[]).unwrap();
+            driver.read_mailbox(mailbox, MAILBOX_CAPACITY, &mut []).unwrap();
             assert_eq!(
                 driver.write_mailbox(mailbox, MAILBOX_CAPACITY - 1, &[1, 2]),
                 Err(Error::OutOfBounds)
@@ -713,12 +689,8 @@ mod tests {
         let mut driver = register_fixture::<Blocking>();
         for mailbox in Mailbox::ALL {
             let control = driver.info.reg().mailbox_control(mailbox.index());
-            control
-                .doorbell()
-                .write(|writer| unsafe { writer.bits(0xffff_fffe) });
-            control
-                .irq_set()
-                .write(|writer| unsafe { writer.bits(0xffff_fffe) });
+            control.doorbell().write(|writer| unsafe { writer.bits(0xffff_fffe) });
+            control.irq_set().write(|writer| unsafe { writer.bits(0xffff_fffe) });
             driver.acknowledge_doorbell(mailbox);
             assert_eq!(control.doorbell().read().bits(), 1);
             driver.raise_host_irq(mailbox);
@@ -744,9 +716,7 @@ mod tests {
         assert_eq!(counter.0.load(Ordering::SeqCst), 1);
         assert_eq!(
             wait.as_mut().poll(&mut context),
-            Poll::Ready(Events {
-                doorbells: [true; 2],
-            })
+            Poll::Ready(Events { doorbells: [true; 2] })
         );
         drop(wait);
         assert_eq!(driver.pending_events().doorbells, [true; 2]);
@@ -793,18 +763,8 @@ mod tests {
         drop(driver);
         assert!(!info.interrupt_enabled.load(Ordering::SeqCst));
         assert!(info.reg().control().read().enable().bit());
-        assert_eq!(
-            info.reg().mailbox_control(0).shared_status().read().bits(),
-            42
-        );
-        assert!(
-            info.reg()
-                .mailbox_control(0)
-                .doorbell()
-                .read()
-                .pending()
-                .bit()
-        );
+        assert_eq!(info.reg().mailbox_control(0).shared_status().read().bits(), 42);
+        assert!(info.reg().mailbox_control(0).doorbell().read().pending().bit());
         assert_eq!(info.memory(Mailbox::Mailbox0).data(0).read().bits(), 0xa5);
     }
 }

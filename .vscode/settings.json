@@ -1,18 +1,18 @@
 {
-    "[markdown]": {
-        "editor.formatOnSave": false
-    },
-    "[toml]": {
-        "editor.formatOnSave": true
-    },
-    "[rust]": {
-        "editor.formatOnSave": true
-    },
+    "editor.formatOnSave": true,
+    "rust-analyzer.checkOnSave": true,
     "rust-analyzer.check.allTargets": false,
-    "rust-analyzer.cargo.features": [],
+    "rust-analyzer.cargo.target": "riscv32imac-unknown-none-elf",
+    "rust-analyzer.cargo.features": "all",
+    "rust-analyzer.check.command": "clippy",
     "rust-analyzer.linkedProjects": [
         "qemu-riscv-pac/Cargo.toml",
-        "embassy-qemu-riscv/Cargo.toml",
-        "examples/Cargo.toml",
-    ]
+        "embassy-qemu-riscv/Cargo.toml"
+    ],
+    "[toml]": {
+        "editor.defaultFormatter": "tamasfe.even-better-toml"
+    },
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    }
 }

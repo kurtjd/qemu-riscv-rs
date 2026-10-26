@@ -1,0 +1,42 @@
+
+# cargo-vet config file
+
+[cargo-vet]
+version = "0.10"
+
+[imports.OpenDevicePartnership]
+url = "https://raw.githubusercontent.com/OpenDevicePartnership/rust-crate-audits/main/audits.toml"
+
+[imports.bytecode-alliance]
+url = "https://raw.githubusercontent.com/bytecodealliance/wasmtime/main/supply-chain/audits.toml"
+
+[imports.google]
+url = "https://raw.githubusercontent.com/google/rust-crate-audits/main/audits.toml"
+
+[imports.mozilla]
+url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
+
+[[exemptions.riscv]]
+version = "0.16.0"
+criteria = "safe-to-deploy"
+notes = "Issues were identified, so we cannot approve this version as safe-to-deploy: singleton! permits recursive initialization that yields aliased mutable references; the review also found CSR-address and interrupt-restoration defects. This core dependency is required by the HAL and PAC, and finding a compatible alternative or maintaining a fork is not feasible at present. This is explicit risk acceptance for this exact version, not an audit approval; the current HAL does not use singleton! or the affected AIA accessor. Reassess on version, API, target, or feature changes; remove after upstream fixes and a successful review."
+
+[[exemptions.riscv-macros]]
+version = "0.4.0"
+criteria = "safe-to-deploy"
+notes = "Issues were identified, so we cannot approve this version as safe-to-deploy: generated exception dispatch passes shared TrapFrame references to handlers that may accept mutable references, violating the supported ownership contract. These macros are required by the core RISC-V dependency stack, and finding a compatible alternative is not feasible at present. This is explicit risk acceptance for this exact version, not an audit approval. Reassess on handler, feature, target, or dependency changes; remove once the coordinated runtime/handler contract is fixed upstream and reviewed."
+
+[[exemptions.riscv-peripheral]]
+version = "0.5.0"
+criteria = "safe-to-deploy"
+notes = "Issues were identified, so we cannot approve this version as safe-to-deploy: safe PLIC threshold reset can invalidate priority-based critical sections; RV32 timer accesses lack coherent read and compare-update protocols; hart/context mapping and supervisor software-interrupt semantics also have defects. This crate supplies the CLINT/PLIC interfaces required by the QEMU PAC, and finding a compatible alternative is not feasible at present. The HAL uses single-hart interrupt masking and hart/context zero, but the RV32 timer issue remains relevant to its time driver and is explicitly accepted as unresolved risk. This is not an audit approval. Reassess on version, target, mapping, critical-section, or timer changes; remove after upstream fixes and validation."
+
+[[exemptions.riscv-rt]]
+version = "0.17.1"
+criteria = "safe-to-deploy"
+notes = "Issues were identified, so we cannot approve this version as safe-to-deploy: shared TrapFrame dispatch conflicts with supported mutable handlers, and trap entry does not preserve floating-point state on F/D targets; additional startup feature defects were found. This is the platform runtime required by the HAL/PAC, and finding a compatible alternative is not feasible at present. The current riscv32imac target avoids the floating-point path but does not resolve the upstream handler-contract issue. This is explicit risk acceptance for this exact version, not an audit approval. Reassess on version, target, handler, or startup-feature changes; remove after coordinated upstream fixes and review."
+
+[[exemptions.riscv-rt-macros]]
+version = "0.6.1"
+criteria = "safe-to-deploy"
+notes = "Issues were identified, so we cannot approve this version as safe-to-deploy: generated trap assembly omits floating-point context preservation, and accepted mutable exception handlers are incompatible with shared-reference runtime dispatch. These macros are required by riscv-rt, and finding a compatible alternative is not feasible at present. The current riscv32imac target avoids floating-point handlers, but the general ownership-contract issue remains unresolved. This is explicit risk acceptance for this exact version, not an audit approval. Reassess on version, target, handler, or feature changes; remove after coordinated upstream fixes and review."
